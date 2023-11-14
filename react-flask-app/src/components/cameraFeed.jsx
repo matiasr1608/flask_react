@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000/streaming");
+const socket = io("/streaming");
 
 const CameraFeed = ({ start_stremaing }) => {
   const [image, setImage] = useState(null);
