@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import "./App.css";
 import Header from "./components/header";
@@ -13,18 +13,23 @@ function App() {
   // const socket = io(URL);
 
   const [count, setCount] = useState(0);
+  const [start_stremaing, setStartStreaming] = useState(false);
   const onSubmit = (e) => {
     e.preventDefault();
   };
+  useEffect(() => {
+    console.log(start_stremaing);
+  }, [start_stremaing]);
+
   return (
     <div className="flex flex-col h-screen w-screen  bg-slate-400">
       <Header></Header>
       <div className="flex flex-col w-screen h-screen items-center pt-40">
         <div className="h-40">
           <h3>Seleccioná el archivo:</h3>
-          <Form></Form>
+          <Form set={setStartStreaming}></Form>
         </div>
-        <CameraFeed></CameraFeed>
+        <CameraFeed start_stremaing={start_stremaing}></CameraFeed>
       </div>
     </div>
     // <div className="App">

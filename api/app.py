@@ -1,10 +1,17 @@
-from flask import Flask, Response, send_from_directory
+from flask import Flask, Response, send_from_directory, request, flash
 from camera import Camera
+from werkzeug.utils import secure_filename
 import os
-
+from flask_socketio import SocketIO, emit
+import time
+import cv2
+import base64
+from threading import Thread
 # app = Flask(__name__)
 app = Flask(__name__,static_folder='../react-flask-app/build')
-
+app.config['UPLOAD_FOLDER'] = "./uploads"
+app.secret_key = 'hola'
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 def gen(camera):
     while True:
@@ -26,6 +33,8 @@ def video_feed():
 #     return send_from_directory('../react-flask-app/build/static', filename)
 
 # Serve React App
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
@@ -36,3 +45,58 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
+@app.route('/upload_file', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        print(request.files)
+        if 'file' not in request.files:
+            flash('No file part')
+            return 'bad request no file part!', 400
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return 'bad request no file!', 400
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return 'archivo guardado', 200
+        
+# # OpenCV setup - Replace '0' with the camera index or video file path
+
+
+@socketio.on('video_feed', namespace='/streaming')
+def image(data):
+    cap = cv2.VideoCapture(0)
+    while not stop: 
+        success, frame = cap.read()
+        # Encode the frame as JPEG
+        if(success):
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame_encoded = base64.b64encode(buffer).decode('utf-8')
+            # Send the frame to the client
+            emit('video_frame', {'image': frame_encoded})
+        time.sleep(1/int(data))
+
+@socketio.on('stop_video_feed', namespace='/streaming')
+def stop(data):   
+    global stop
+    stop = True
+
+
+
+@socketio.on('connect', namespace='/streaming')
+def handle_connect():
+    global cap, stop
+    stop = False
+
+    print("Client connected")
+
+@socketio.on('disconnect',namespace='/streaming')
+def test_disconnect():
+    global cap
+    print('Client disconnected')
+
+    cap.release()
