@@ -103,7 +103,7 @@ def stop(data):
 
 @socketio.on('connect', namespace='/streaming')
 def handle_connect():
-    global cap, stop
+    global stop
     stop = False
 
     print("Client connected")
