@@ -7,6 +7,8 @@ import time
 import cv2
 import base64
 from threading import Thread
+import serial
+
 # app = Flask(__name__)
 app = Flask(__name__,static_folder='../react-flask-app/build')
 app.config['UPLOAD_FOLDER'] = "/home/admin/disco_microbit/"
@@ -62,8 +64,18 @@ def upload_file():
         if file:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            with serial.Serial('/dev/ttyACM0', baudrate=9600) as ser:
+                ser.write(file.read())
             return 'archivo guardado', 200
-        
+
+
+
+# def send_file_to_microbit(file_path):
+#     ser = serial.Serial('/dev/ttyUSB0', baudrate=9600)  # Update with your Microbit serial port
+#     with open(file_path, 'rb') as file:
+#         file_data = file.read()
+#         ser.write(file_data)
+#     ser.close()
 # # OpenCV setup - Replace '0' with the camera index or video file path
 
 
