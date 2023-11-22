@@ -63,8 +63,8 @@ def upload_file():
             return 'bad request no file!', 400
         if file:
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with serial.Serial('/dev/ttyACM0', baudrate=9600) as ser:
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            with serial.Serial('/dev/ttyACM0', baudrate=115200) as ser:
                 ser.write(file.read())
             return 'archivo guardado', 200
 
