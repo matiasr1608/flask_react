@@ -9,7 +9,7 @@ import base64
 from threading import Thread
 # app = Flask(__name__)
 app = Flask(__name__,static_folder='../react-flask-app/build')
-app.config['UPLOAD_FOLDER'] = "./uploads"
+app.config['UPLOAD_FOLDER'] = "/dev/ttyACM0"
 app.secret_key = 'hola'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -98,5 +98,11 @@ def handle_connect():
 def test_disconnect():
     global cap
     print('Client disconnected')
+    if(cap):
+        cap.release()
 
-    cap.release()
+
+# if __name__ == "__main__":
+#     from waitress import serve
+#     serve(app, host="0.0.0.0", port=5000)
+
