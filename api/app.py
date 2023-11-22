@@ -64,8 +64,8 @@ def upload_file():
         if file:
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # with serial.Serial('/dev/ttyACM0', baudrate=9600) as ser:
-            #     ser.write(file.read())
+            with serial.Serial('/dev/ttyACM0', baudrate=9600) as ser:
+                ser.write(file.read())
             return 'archivo guardado', 200
 
 
