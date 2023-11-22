@@ -9,7 +9,7 @@ import base64
 from threading import Thread
 # app = Flask(__name__)
 app = Flask(__name__,static_folder='../react-flask-app/build')
-app.config['UPLOAD_FOLDER'] = "/dev/ttyACM0"
+app.config['UPLOAD_FOLDER'] = "/home/admin/disco_microbit/"
 app.secret_key = 'hola'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
