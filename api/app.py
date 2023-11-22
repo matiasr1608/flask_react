@@ -11,7 +11,7 @@ import serial
 
 # app = Flask(__name__)
 app = Flask(__name__,static_folder='../react-flask-app/build')
-app.config['UPLOAD_FOLDER'] = "/media/imasdemasi/MICROBIT/"
+app.config['UPLOAD_FOLDER'] = "./uploads"
 app.secret_key = 'hola'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -63,9 +63,11 @@ def upload_file():
             return 'bad request no file!', 400
         if file:
             filename = secure_filename(file.filename)
-            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            with serial.Serial('/dev/disk/by-label/MICROBIT', baudrate=115200) as ser:
-                ser.write(file.read())
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            print(filename)
+            os.system("sudo cp ./uploads/{} /dev/disk/by-label/MICROBIT".format(filename))
+            # with serial.Serial('/dev/disk/by-label/MICROBIT', baudrate=115200) as ser:
+            #     ser.write(file.read())
             return 'archivo guardado', 200
 
 
